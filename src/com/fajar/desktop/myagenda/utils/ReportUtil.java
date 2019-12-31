@@ -45,7 +45,7 @@ public class ReportUtil {
         if (title.equals("")) {
             title = "tabel";
         }
-        String f = title + ".xls";
+        String filePath = title + ".xls";
         WritableWorkbook wb;
 
         WritableCellFormat commonFormat = new WritableCellFormat();
@@ -53,7 +53,7 @@ public class ReportUtil {
         commonFormat.setAlignment(Alignment.CENTRE);
         commonFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
 
-        wb = Workbook.createWorkbook(new File(f));
+        wb = Workbook.createWorkbook(new File(filePath));
         WritableSheet sheet = wb.createSheet("tabel", 0);
         int columnSize = tabel.getColumnCount();
         int rowSize = tabel.getRowCount();
@@ -65,15 +65,15 @@ public class ReportUtil {
         for (int row = 0; row < rowSize; row++) {
             for (int col = 0; col < columnSize; col++) {
                 if (tabel.getValueAt(row, col) instanceof Number) {
-                    jxl.write.Number n;
+                    jxl.write.Number numberCell;
                     if (tabel.getValueAt(row, col).getClass().equals(Double.class)) {
-                        n = new jxl.write.Number(col + 2, row + 4, (Double) tabel.getValueAt(row, col));
+                        numberCell = new jxl.write.Number(col + 2, row + 4, (Double) tabel.getValueAt(row, col));
 
                     } else {
-                        n = new jxl.write.Number(col + 2, row + 4, (Integer) tabel.getValueAt(row, col));
+                        numberCell = new jxl.write.Number(col + 2, row + 4, (Integer) tabel.getValueAt(row, col));
                     }
-                    n.setCellFormat(commonFormat);
-                    sheet.addCell(n);
+                    numberCell.setCellFormat(commonFormat);
+                    sheet.addCell(numberCell);
                 } else {
                     String val = tabel.getValueAt(row, col) == null ? "" : tabel.getValueAt(row, col).toString();
                     Label label = new Label(col + 2, row + 4, val);
@@ -86,7 +86,7 @@ public class ReportUtil {
         wb.write();
         wb.close();
         if (Desktop.isDesktopSupported()) {
-            File myFile = new File(f);
+            File myFile = new File(filePath);
             Desktop.getDesktop().open(myFile);
         }
     }

@@ -6,9 +6,9 @@
 package com.fajar.desktop.myagenda.gui;
 
 import com.fajar.desktop.myagenda.Agenda;
+import com.fajar.desktop.myagenda.App;
 import com.fajar.desktop.myagenda.utils.ReportUtil;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -19,7 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-import jxl.write.WriteException; 
+import jxl.write.WriteException;
 
 /**
  *
@@ -30,18 +30,19 @@ public class MyAgenda extends javax.swing.JFrame {
     /**
      * Creates new form AcaraPanitia
      */
-    private List<Agenda> agendaList = new ArrayList<>();
-    private boolean isAddNew = true;
-    private Agenda selectedAgenda = new Agenda();
-    private int beginningHour = 0, beginningMinute = 0;
-    private int currentHour = 0, currentMinute = 0;
-    private Integer durationHour = 0, durationMinute = 0;
-    private String path = "";
+//    private List<Agenda> agendaList = new ArrayList<>();
+//    private boolean isAddNew = true;
+//    private Agenda selectedAgenda = new Agenda();
+//    private int beginningHour = 0, beginningMinute = 0;
+//    private int currentHour = 0, currentMinute = 0;
+//    private int durationHour = 0, durationMinute = 0;
+//    private String loadedExcelFilePath = "";
+    private final App app = new App();
     DefaultTableModel model;
-    
+
     public MyAgenda() {
         initComponents();
-        initBaginningTime();
+        initBeginningTime();
     }
 
     /**
@@ -77,7 +78,7 @@ public class MyAgenda extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jButton5 = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
-        txt_path = new javax.swing.JTextField();
+        txtFilePath = new javax.swing.JTextField();
         jTextField1 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         agendaTable = new javax.swing.JTable();
@@ -87,7 +88,7 @@ public class MyAgenda extends javax.swing.JFrame {
         setBackground(new java.awt.Color(255, 255, 255));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(null));
+        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jLabel1.setText("Durasi ");
 
@@ -204,7 +205,7 @@ public class MyAgenda extends javax.swing.JFrame {
 
         jLabel8.setText("File Path");
 
-        txt_path.setBorder(javax.swing.BorderFactory.createLineBorder(null));
+        txtFilePath.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -237,7 +238,7 @@ public class MyAgenda extends javax.swing.JFrame {
                                 .addGap(4, 4, 4)
                                 .addComponent(jLabel8)
                                 .addGap(32, 32, 32)
-                                .addComponent(txt_path, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jButton5))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -321,7 +322,7 @@ public class MyAgenda extends javax.swing.JFrame {
                     .addComponent(jButton2)
                     .addComponent(jButton4)
                     .addComponent(jLabel8)
-                    .addComponent(txt_path, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -368,80 +369,33 @@ public class MyAgenda extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private Agenda getAgendaById(int id) {
-        for (Agenda k : agendaList) {
-            if (k.getId() == id) {
-                return k;
-            }
-        }
-        return null;
-    }
-    
-    private Agenda getAgendaByName(String nama) {
-        for (Agenda k : agendaList) {
-            if (k.getAgendaName().equals(nama)) {
-                return k;
-            }
-        }
-        return null;
-    }
 
     private void textBoxDurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textBoxDurationActionPerformed
-       
+
     }//GEN-LAST:event_textBoxDurationActionPerformed
-    
-    private Agenda getAgendaByPrevId(int id) {
-        for (Agenda k : agendaList) {
-            if (k.getPreviousId().equals(id)) {
-                return k;
-            }
-        }
-        return null;
-    }
-    
-    private boolean updateAgenda(Agenda agenda) {
-        for (Agenda k : agendaList) {
-            if (Objects.equals(k.getId(), agenda.getId())) {
-                k = agenda;
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private boolean checkNameAvailability(Agenda agenda) {
-        for (Agenda k : agendaList) {
-            if (k.getAgendaName().equals(agenda.getAgendaName())) {
-                if (!k.getId().equals(agenda.getId())) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
+
     private void replacePrev(Agenda move, Agenda previousAgenda) {
-        
+
         int idPrevOld = move.getPreviousId();
-        Agenda oldPredecessor = getAgendaByPrevId(move.getId());
+        Agenda oldPredecessor = app.getAgendaByPrevId(move.getId());
         System.out.println("MOVE " + move);
         System.out.println("has prev " + previousAgenda);
         System.out.println("OLD SUCCESSOR " + oldPredecessor);
         if (oldPredecessor != null) {
             oldPredecessor.setPreviousId(idPrevOld);
         }
-        
+
         if (previousAgenda != null) {
             move.setPreviousId(previousAgenda.getPreviousId());
             previousAgenda.setPreviousId(move.getId());
-            
+
         }
-        
+
         System.out.println("--new move " + move);
         System.out.println("--new hasprev " + previousAgenda);
         System.out.println("--new oldSuccessor " + oldPredecessor);
-        
-        for (Agenda k : agendaList) {
+
+        for (Agenda k : app.getAgendaList()) {
             if (k.getId().equals(move.getId())) {
                 k = move;
             } else if (previousAgenda != null && k.getId().equals(previousAgenda.getId())) {
@@ -450,187 +404,186 @@ public class MyAgenda extends javax.swing.JFrame {
                 k = oldPredecessor;
             }
         }
-        
+
     }
 
-    private void btn_simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_simpanActionPerformed
-       
-        Random r = new Random();
-        int newAgendaId = 1000 + r.nextInt(9000);
-        if (isAddNew) {
-            selectedAgenda.setId(newAgendaId);
+    private void saveNewAgenda() {
+
+        int newAgendaId = 1000 + new Random().nextInt(9000);
+        if (app.isAddNew()) {
+            app.getSelectedAgenda().setId(newAgendaId);
         }
-        int durasi = Integer.parseInt(textBoxDuration.getText());
+        int durasi;
+        try {
+            durasi = Integer.parseInt(textBoxDuration.getText());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            durasi = 0;
+        }
         String agendaName = textBoxAgendaName.getText();
-        Agenda prev = getAgendaByName(comboBoxPrevious.getSelectedItem().toString());
-        if (prev != null && prev.getId().equals(selectedAgenda.getId())) {
+        Agenda prev = app.getAgendaByName(comboBoxPrevious.getSelectedItem().toString());
+        if (prev != null && prev.getId().equals(app.getSelectedAgenda().getId())) {
             JOptionPane.showMessageDialog(null, "Pilih kegiatan lain");
             return;
         }
         int idPrev = prev == null ? 0 : prev.getId();
-        Agenda hasPrev = getAgendaByPrevId(idPrev);
-        
-        if (hasPrev != null && selectedAgenda.getPreviousId() != idPrev) {
-            replacePrev(selectedAgenda, hasPrev);
-        } else if (hasPrev == null && getAgendaByPrevId(selectedAgenda.getId()) != null) {
-            replacePrev(selectedAgenda, hasPrev);
+        Agenda hasPrev = app.getAgendaByPrevId(idPrev);
+
+        if (hasPrev != null && app.selectedAgenda.getPreviousId() != idPrev) {
+            replacePrev(app.selectedAgenda, hasPrev);
+        } else if (hasPrev == null && app.getAgendaByPrevId(app.selectedAgenda.getId()) != null) {
+            replacePrev(app.selectedAgenda, hasPrev);
         }
-        
-        if (isAddNew) {
-            selectedAgenda = new Agenda(newAgendaId, durasi, agendaName);
-            selectedAgenda.setPreviousId(idPrev);
-            if (idPrev == 0 && getAgendaByPrevId(0) != null) {
-                replacePrev(selectedAgenda, getAgendaByPrevId(0));
+
+        if (app.isAddNew()) {
+            app.selectedAgenda = new Agenda(newAgendaId, durasi, agendaName);
+            app.selectedAgenda.setPreviousId(idPrev);
+            if (idPrev == 0 && app.getAgendaByPrevId(0) != null) {
+                replacePrev(app.selectedAgenda, app.getAgendaByPrevId(0));
             }
-            if (!checkNameAvailability(selectedAgenda)) {
+            if (!app.checkNameAvailability(app.selectedAgenda)) {
                 JOptionPane.showConfirmDialog(null, "Nama tidak boleh sama !");
                 return;
             }
-            agendaList.add(selectedAgenda);
+            app.getAgendaList().add(app.selectedAgenda);
         } else {
-            selectedAgenda.setDuration(durasi);
-            selectedAgenda.setAgendaName(agendaName);
-            selectedAgenda.setPreviousId(idPrev);
-            if (!checkNameAvailability(selectedAgenda)) {
+            app.selectedAgenda.setDuration(durasi);
+            app.selectedAgenda.setAgendaName(agendaName);
+            app.selectedAgenda.setPreviousId(idPrev);
+            if (!app.checkNameAvailability(app.selectedAgenda)) {
                 JOptionPane.showConfirmDialog(null, "Nama tidak boleh sama !");
                 return;
             }
-            updateAgenda(selectedAgenda);
-            isAddNew = true;
+            app.updateAgenda(app.selectedAgenda);
+            app.setAddNew(true);
         }
         resetField();
-        updateTabel(agendaList);
+        refreshTable(app.getAgendaList());
+    }
+
+    private void btn_simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_simpanActionPerformed
+
+        saveNewAgenda();
 
     }//GEN-LAST:event_btn_simpanActionPerformed
-    
+
     private void resetField() {
         textBoxDurationHour.setText("0");
         textBoxDurationMinute.setText("0");
         textBoxDuration.setText("0");
-        durationHour = 0;
-        durationMinute = 0;
+
+        app.setDurationHour(0);
+        app.setDurationMinute(0);
+
         textBoxAgendaName.setText("");
-        selectedAgenda = new Agenda();
+        app.selectedAgenda = new Agenda();
     }
 
     private void btn_tambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_tambahActionPerformed
-       
-        isAddNew = true;
+
+        app.setAddNew(true);
         resetField();
     }//GEN-LAST:event_btn_tambahActionPerformed
 
     private void agendaTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_agendaTableMouseClicked
-       
+
         int row = agendaTable.getSelectedRow();
         int id = Integer.parseInt(agendaTable.getModel().getValueAt(row, 1).toString());
-        selectedAgenda = getAgendaById(id);
-        if (selectedAgenda != null) {
-            isAddNew = false;
-            durationHour = selectedAgenda.getDuration() / 60;
-            durationMinute = selectedAgenda.getDuration() % 60;
-            textBoxDurationHour.setText(durationHour.toString());
-            textBoxDurationMinute.setText(durationMinute.toString());
-            textBoxDuration.setText(selectedAgenda.getDuration().toString());
-            textBoxAgendaName.setText(selectedAgenda.getAgendaName());
-            int idPrev = selectedAgenda.getPreviousId();
-            
-            Agenda prev = idPrev != 0 ? getAgendaById(idPrev) : null;
-            System.out.println(selectedAgenda + " prev= " + prev);
-            comboBoxPrevious.setSelectedItem(selectedAgenda.getPreviousId() != 0 ? prev.getAgendaName() : "none");
-        }
+        setSelectedAgenda(id);
     }//GEN-LAST:event_agendaTableMouseClicked
 
     private void comboBoxHourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxHourActionPerformed
-       
-        beginningHour = Integer.parseInt(comboBoxHour.getSelectedItem().toString());
+
+        app.setBeginningHour(Integer.parseInt(comboBoxHour.getSelectedItem().toString()));
+
     }//GEN-LAST:event_comboBoxHourActionPerformed
 
     private void comboBoxMinuteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxMinuteActionPerformed
-       
-        beginningMinute = Integer.parseInt(comboBoxMinute.getSelectedItem().toString());
+
+        app.setBeginningMinute(Integer.parseInt(comboBoxMinute.getSelectedItem().toString()));
     }//GEN-LAST:event_comboBoxMinuteActionPerformed
 
     private void btn_update_mulaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_update_mulaiActionPerformed
-       
-        updateTabel(agendaList);
+        refresh();
+
     }//GEN-LAST:event_btn_update_mulaiActionPerformed
 
+    private void refresh() {
+        refreshTable(app.getAgendaList());
+    }
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       
-        deleteAgenda(selectedAgenda);
-        updateTabel(agendaList);
+        deleteSelectedAgenda();
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void deleteSelectedAgenda() {
+        int confirm = JOptionPane.showConfirmDialog(null, "Are you sure to delete agenda?");
+        if (confirm == 0) {
+            app.deleteSelectedAgenda();
+            refresh();
+        }
+    }
+
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here
-        agendaList.clear();
-        updateTabel(agendaList);
+        clear();
     }//GEN-LAST:event_jButton2ActionPerformed
-    
-    private void updateDur() {
-        Integer min_dur = durationHour * 60 + durationMinute;
-        textBoxDuration.setText(min_dur.toString());
+
+    private void clear() {
+        app.getAgendaList().clear();
+        refresh();
+    }
+
+    private void updateGUIDuration() {
+        Integer durationInMinute = app.getDurationHour() * 60 + app.getDurationMinute();
+        textBoxDuration.setText(durationInMinute.toString());
     }
 
     private void textBoxDurationHourKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textBoxDurationHourKeyReleased
-       
-        String dur = textBoxDurationHour.getText();
-        durationHour = dur.equals("") ? 0 : Integer.parseInt(dur);
-        updateDur();
+
+        setDurationHour(textBoxDurationHour.getText());
     }//GEN-LAST:event_textBoxDurationHourKeyReleased
 
+    private void setDurationHour(String duration) {
+        app.setDurationHour(duration.equals("") ? 0 : Integer.parseInt(duration));
+        updateGUIDuration();
+    }
+
+    private void setDurationMinute(String duration) {
+        app.setDurationMinute(duration.equals("") ? 0 : Integer.parseInt(duration));
+        updateGUIDuration();
+    }
+
     private void textBoxDurationMinuteKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textBoxDurationMinuteKeyReleased
-       
-        String dur = textBoxDurationMinute.getText();
-        durationMinute = dur.equals("") ? 0 : Integer.parseInt(dur);
-        updateDur();
+
+        setDurationMinute(textBoxDurationMinute.getText());
     }//GEN-LAST:event_textBoxDurationMinuteKeyReleased
 
     private void comboBoxPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxPreviousActionPerformed
-       
+
     }//GEN-LAST:event_comboBoxPreviousActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         try {
-           
+
             ReportUtil.printReport(agendaTable);
-        } catch (WriteException ex) {
-            Logger.getLogger(MyAgenda.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (WriteException | IOException ex) {
             Logger.getLogger(MyAgenda.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-       
-        List<Agenda> ls = ReportUtil.loadAgenda(path);
-        if (ls.size() > 0) {
-            agendaList = ls;
-            updateTabel(agendaList);
-        }else{
-            JOptionPane.showMessageDialog(null, "FILE TIDAK VALID");
-        }
+
+        loadAgenda();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-       
-        JFileChooser fc = new JFileChooser();
-        FileFilter ff_xls = new FileNameExtensionFilter("xls", "xls");
-        FileFilter ff_xlsx = new FileNameExtensionFilter("xlsx", "xlsx");
-        fc.addChoosableFileFilter(ff_xls);
-        fc.addChoosableFileFilter(ff_xlsx);
-        int result = fc.showSaveDialog(this);
-        
-        if (result == JFileChooser.APPROVE_OPTION) {
-            path = fc.getSelectedFile().getAbsolutePath();
-        } else if (result == JFileChooser.CANCEL_OPTION) {
-            System.out.println("Cancel was selected");
-        }
-        txt_path.setText(path);
+
+        chooseFileToLoad();
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-       
+
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     /**
@@ -668,55 +621,20 @@ public class MyAgenda extends javax.swing.JFrame {
                 new MyAgenda().setVisible(true);
             }
         });
-        
+
     }
-    
+
     private void updateComboBox(List<Agenda> agendas) {
         comboBoxPrevious.removeAllItems();
         comboBoxPrevious.addItem("none");
         for (Agenda k : agendas) {
             comboBoxPrevious.addItem(k.getAgendaName());
-            
+
         }
     }
-    
-    private void updateHour(int duration) {
-        int hour = currentHour;
-        int minute = currentMinute;
-        for (int i = 1; i <= duration; i++) {
-            minute++;
-            // System.out.println("menit " + menit);
-            if (minute % 60 == 0) {
-                hour++;
-                if (hour > 23) {
-                    hour = 0;
-                }
-                minute = 0;
-            }
-        }
-        
-        currentHour = hour;
-        currentMinute = minute;
-    }
-    
-    private void deleteAgenda(Agenda kg) {
-        Agenda kAfter = getAgendaByPrevId(kg.getId());
-        kAfter.setPreviousId(kg.getPreviousId());
-        for (Agenda k : agendaList) {
-            if (k.getId().equals(kg.getId())) {
-                agendaList.remove(k);
-                break;
-            }
-        }
-        for (Agenda k : agendaList) {
-            if (k.getId().equals(kAfter.getId())) {
-                k = kAfter;
-            }
-        }
-    }
-    
-    private void updateTabel(List<Agenda> listKegiatan) {
-        for (Agenda k : listKegiatan) {
+
+    private void refreshTable(List<Agenda> agendas) {
+        for (Agenda k : agendas) {
             System.out.println(k);
         }
         System.out.println("---------tabel---------");
@@ -727,50 +645,46 @@ public class MyAgenda extends javax.swing.JFrame {
                 }
         );
         int no = 0;
-        currentHour = beginningHour;
-        currentMinute = beginningMinute;
-        Agenda kRunning = new Agenda();
-        for (int i = 0; i < listKegiatan.size(); i++) {
+        app.setCurrentHour(app.getBeginningHour());
+        app.setCurrentMinute(app.getBeginningMinute());
+        Agenda currentAgenda = new Agenda();
+        for (int i = 0; i < agendas.size(); i++) {
             System.out.print("i " + i + ". ");
             if (i == 0) {
-                kRunning = getAgendaByPrevId(0);
+                currentAgenda = app.getAgendaByPrevId(0);
             } else {
-                int idPrev = kRunning.getId();
-                kRunning = getAgendaByPrevId(idPrev);
+                int idPrev = currentAgenda.getId();
+                currentAgenda = app.getAgendaByPrevId(idPrev);
             }
-            System.out.println(kRunning);
-            
+            System.out.println(currentAgenda);
+
             Object[] o = new Object[8];
             no++;
             o[0] = no;
-            o[1] = kRunning.getId();
-            o[2] = currentHour + ":" + currentMinute;
-            int durasi = kRunning.getDuration();
-            o[3] = durasi;
-            updateHour(durasi);
-            o[4] = currentHour + ":" + currentMinute;
-            o[5] = kRunning.getAgendaName();
-            Agenda prev = getAgendaById(kRunning.getPreviousId());
-            
-            o[6] = kRunning.getPreviousId() != 0 ? prev.getAgendaName() : "-";
-            
+            o[1] = currentAgenda.getId();
+            o[2] = app.getCurrentHour() + ":" + app.getCurrentMinute();
+            o[3] = app.updateHourAndMinute(currentAgenda.getDuration());
+            o[4] = app.getCurrentHour() + ":" + app.getCurrentMinute();
+            o[5] = currentAgenda.getAgendaName();
+            Agenda prev = app.getAgendaById(currentAgenda.getPreviousId());
+
+            o[6] = currentAgenda.getPreviousId() != 0 ? prev.getAgendaName() : "-";
+
             model.addRow(o);
             // System.out.println(o);
         }
         agendaTable.setModel(model);
-        updateComboBox(listKegiatan);
+        updateComboBox(agendas);
     }
-    
-     
-     
-     
-    private void initBaginningTime() {
+
+    private void initBeginningTime() {
         for (Integer i = 1; i <= 23; i++) {
             comboBoxHour.addItem(i.toString());
         }
         for (Integer i = 1; i <= 59; i++) {
             comboBoxMinute.addItem(i.toString());
         }
+        resetField();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -801,6 +715,50 @@ public class MyAgenda extends javax.swing.JFrame {
     private javax.swing.JTextField textBoxDuration;
     private javax.swing.JTextField textBoxDurationHour;
     private javax.swing.JTextField textBoxDurationMinute;
-    private javax.swing.JTextField txt_path;
+    private javax.swing.JTextField txtFilePath;
     // End of variables declaration//GEN-END:variables
+
+    private void setSelectedAgenda(int id) {
+        app.selectedAgenda = app.getAgendaById(id);
+        if (app.selectedAgenda != null) {
+            app.setAddNew(false);
+            app.setDurationHour(app.selectedAgenda.getDuration() / 60);
+            app.setDurationMinute(app.selectedAgenda.getDuration() % 60);
+            textBoxDurationHour.setText(String.valueOf(app.getDurationHour()));
+            textBoxDurationMinute.setText(String.valueOf(app.getDurationMinute()));
+            textBoxDuration.setText(app.selectedAgenda.getDuration().toString());
+            textBoxAgendaName.setText(app.selectedAgenda.getAgendaName());
+            int idPrev = app.selectedAgenda.getPreviousId();
+
+            Agenda prev = idPrev != 0 ? app.getAgendaById(idPrev) : null;
+            System.out.println(app.selectedAgenda + " prev= " + prev);
+            comboBoxPrevious.setSelectedItem(app.selectedAgenda.getPreviousId() != 0 ? prev.getAgendaName() : "none");
+        }
+    }
+
+    private void loadAgenda() {
+        List<Agenda> agendas = ReportUtil.loadAgenda(app.getLoadedExcelFilePath());
+        if (agendas.size() > 0) {
+            app.setAgendaList(agendas);
+            refresh();
+        } else {
+            JOptionPane.showMessageDialog(null, "FILE TIDAK VALID");
+        }
+    }
+
+    private void chooseFileToLoad() {
+        JFileChooser fileChooser = new JFileChooser();
+        FileFilter ff_xls = new FileNameExtensionFilter("xls", "xls");
+        FileFilter ff_xlsx = new FileNameExtensionFilter("xlsx", "xlsx");
+        fileChooser.addChoosableFileFilter(ff_xls);
+        fileChooser.addChoosableFileFilter(ff_xlsx);
+        int result = fileChooser.showSaveDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            app.setLoadedExcelFilePath(fileChooser.getSelectedFile().getAbsolutePath());
+        } else if (result == JFileChooser.CANCEL_OPTION) {
+            System.out.println("Cancel was selected");
+        }
+        txtFilePath.setText(app.getLoadedExcelFilePath());
+    }
 }
