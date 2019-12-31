@@ -42,7 +42,7 @@ public class ReportUtil {
 
     public static void printReport(JTable tabel) throws WriteException, IOException {
         String title = JOptionPane.showInputDialog("Masukkan nama file");
-        if (title == "") {
+        if (title.equals("")) {
             title = "tabel";
         }
         String f = title + ".xls";
@@ -91,13 +91,13 @@ public class ReportUtil {
         }
     }
 
-    public static List<Agenda> loadAgenda(String namaFile) {
+    public static List<Agenda> loadAgenda(String fileName) {
 
-        FileInputStream file = null;
+        FileInputStream file =null;
         List<Agenda> agendaList = new ArrayList<Agenda>();
 
         try {
-            file = new FileInputStream(new File( namaFile));
+            file = new FileInputStream(new File( fileName));
             //Create Workbook instance holding reference to .xlsx file
             HSSFWorkbook workbook = new HSSFWorkbook(file);
             //Get first/desired sheet from the workbook
@@ -141,7 +141,8 @@ public class ReportUtil {
             Logger.getLogger(ReportUtil.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                file.close();
+                if(file != null)
+                    file.close();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, ex);
                 Logger.getLogger(ReportUtil.class.getName()).log(Level.SEVERE, null, ex);
